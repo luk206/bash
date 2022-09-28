@@ -1,14 +1,15 @@
 
 if [[ $# -eq 0 ]] ; then
-    echo "Usage: $0 profilePattern bucketName"
+    echo "Usage: $0 PROFILEPATTERN BUCKETNAME"
     exit 1
 fi
 
-profilePattern=$1
-bucketName=$2
+PROFILEPATTERN=$1
+BUCKETNAME=$2
 
-for i in $(aws configure list-profiles | grep "${profilePattern}"); do
-  BUCKET=${bucketName};
+for i in $(aws configure list-profiles | grep "${PROFILEPATTERN}"); do
+  BUCKET=${BUCKETNAME};
   export AWS_PROFILE=${i}
-  aws s3 ls | grep "${BUCKET}" && echo "${i}" ;
+  AWS_ACCOUNT_ID=$(aws sts get-caller-identity | jq -r '.Account')
+  aws s3 ls | grep "${BUCKET}" && echo "${i}" && echo "${AWS_ACCOUNT_ID}" ;
 done
